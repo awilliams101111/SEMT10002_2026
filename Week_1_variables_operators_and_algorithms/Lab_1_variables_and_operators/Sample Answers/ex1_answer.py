@@ -1,42 +1,61 @@
-'''
-## Exercise 1 - Binary to Decimal Conversion
+# =============================================================================
+# Exercise 1 - Storing information about a robot
+# =============================================================================
+#
+# Over the duration of this course, we're going to build a piece of code that
+# can simulate the behaviour of a two-wheeled mobile robot. You can find out
+# more about this model of robot at:
+#   https://www.pololu.com/category/202/romi-chassis-and-accessories
+#
+# The first step in building this code is storing some information about the
+# robot.
+#
+# The robot has two wheels separated by a distance (5.906 inches). Each wheel
+# has a radius (1.378 inches) and turns at an angular speed, omega. The robot
+# itself has a radius of 3.248 inches.
+#
+# We'll need to keep track of the robot's centre point (x, y) and orientation
+# theta, measured clockwise from the y-axis.
+#
+# Create some variables to store this data in a Python script. Your code should
+# convert any information given in inches to metric units - don't do this by
+# hand! You should store the following pieces of data:
+#
+#   - The robot's name (your choice).
+#   - The robot's radius in millimetres.
+#   - The distance between the robot's two wheels in millimetres.
+#   - The robot's current position and orientation (x = 0 mm, y = 0 mm,
+#     theta = 0 rad).
+#   - The radius of the robot's wheels in millimetres.
+#
+# Call your file "robot.py" and save it somewhere you'll remember, as we'll
+# return to this file in later weeks.
+# =============================================================================
 
-We saw in the lecture notes that computers represent integers using a binary code.
-We can convert from binary to decimals to remembering that each digit corresponds to a particular power of 2, 
-and then summing up the values of each digit. In this exercise, you should write some code to:
+# The measurements below are given in inches (as in the task description).
+# Convert them to millimetres in your code -- 1 inch = 25.4 mm.
+# Don't do the conversion by hand!
 
-1. Converting a binary "string" to a decimal number (Recall that, for example, `my_string[3]` will access the 4th character of the string variable)
-2. Converting a decimal number into a binary string (You may want to use the modulo operator - `%` - to do this).
+wheel_separation_in = 5.906   # distance between the two wheels
+wheel_radius_in     = 1.378   # radius of each wheel
+robot_radius_in     = 3.248   # radius of the robot body
 
-Start by writing code that solves only the examples given.  
-Given time, try writing code that works for different input values.  
-You can assume the same sizes as given.
-'''
+# Your code here:
+#   - give the robot a name
+#   - store the robot radius, wheel separation and wheel radius in millimetres
+#   - store the current position and orientation (x = 0 mm, y = 0 mm,
+#     theta = 0 rad)
 
-#Binary to decimal conversion. Replace the '???' with your code.
-binary_string = '1101'
+robot_name = "Robby"
+robot_radius_mm = robot_radius_in * 25.4
+wheel_separation_mm = wheel_separation_in * 25.4
+wheel_radius_m  = wheel_radius_in * 25.4
 
-#First, we need to take take each element of the string and convert it to an integer using int() 
-#Next we need multiply the value of each element by the amount it represents- 
-# i.e the first number is multiplied by 8 (=2^3), the next by 4 (=2^2) and so on.
-decimal_value = ((int(binary_string[0]) * 2**3) +
-(int(binary_string[1])* 2**2) + 
-(int(binary_string[2])* 2**1) + 
-(int(binary_string[3])* 2**0))
+x = 0
+y = 0
+theta = 0
 
-print(decimal_value)
-
-#Decimal to binary conversion. Replace the '???' with your code.
-decimal_value2 = 13
-#To find the first bit of our binary number we divide by 8. 
-#If the result is bigger than 1, the first bit should be 1. 
-#If its less than 1, the first bit should be 0.
-#We can achieve this using floor division (//) which will round the result down to the nearest integer.
-#To find the next bit, we first find the remainder when the decimal value is divided by 8 (with the modulo operator, %)
-#We then use floor division (// 4) to determine whether the bit should be a 1 or a 0. 
-#Repeating this pattern for each digit, we get our binary number.
-binary_string = (str(decimal_value2 // (2**3)) + 
-str(((decimal_value2) % (2**3)) // 2**2) + 
-str(((decimal_value2) % (2**2)) // 2**1) + 
-str(((decimal_value2) % (2**1)) // 2**0))
-print(binary_string)
+print("Name: ", robot_name)
+print("Radius: ", robot_radius_mm)
+print("Wheel spacing: ", wheel_separation_mm)
+print("x: ", x, "y: ", y, "theta: ", theta)

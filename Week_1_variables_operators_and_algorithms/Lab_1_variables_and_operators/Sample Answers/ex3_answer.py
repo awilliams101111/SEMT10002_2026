@@ -1,20 +1,52 @@
-'''
-## Exercise 3 - Collision Detection
+# =============================================================================
+# Exercise 3 - Collision Detection
+# =============================================================================
+#
+# In robotics, we often need to know whether two objects have collided. A
+# simple approach is to model each object as a circle: if the distance between
+# their centres is less than the sum of their radii, they have collided.
+#
+# For now, consider the simpler case: a single point and a circle. A point at
+# (x, y) lies inside a circle centred at (u, v) with radius R if:
+#
+#     sqrt((x - u)**2 + (y - v)**2) < R
+#
+# Unfortunately, we haven't introduced a square root function yet. Your task is
+# to rewrite this condition so that it can be evaluated using only the
+# arithmetic and comparison operators covered this week.
+#
+# Test your solution on the two cases below. Each should print a single boolean
+# value.
+#
+#   Test case 1:
+#     Robot centred at (0, 0) with radius 82.5 mm.
+#     Obstacle at (50, 60) mm.
+#     Expected output: True
+#
+#   Test case 2:
+#     Robot centred at (0, 0) with radius 82.5 mm.
+#     Obstacle at (70, 60) mm.
+#     Expected output: False
+#
+# Without using the square root function, complete the code below to test
+# whether the point (x, y) is within radius R of point (u, v).
+# =============================================================================
 
-If we have a circle centered at point $(u,v)$ and with radius $R$, we can calculate whether another point $(x, y)$ 
-is inside the circle by checking whether the Euclidean distance between the points 
-(i.e Pythagoras theorem for the hypotenuse - distance = $\sqrt((x-u)^2 + (y-v)^2)$) is less than the radius. 
-Unfortunately, taking a square root is *not* one of the fundamental operations we have available to us, 
-(we'll see how to use the square root function soon).
+# Robot parameters
+u = 0       # robot x position (mm)
+v = 0       # robot y position (mm)
+R = 82.5    # robot body radius (mm)
 
-Without using the square root function, complete the code below to test whether the point (x,y) is with radius R of point (u,v).
-'''
+# Test case 1
+x = 50      # obstacle x position (mm)
+y = 60      # obstacle y position (mm)
 
-x = 0
-y = 0
-u = 1
-v = 0
-R = 1
+print("Test case 1")
+print ((u-x)**2 + (v-y)**2 < R**2)
 
-#There's more than one way to do this, but the easiest is to realise that we can square both sides of the inequality.
-print((x-u)**2 + (y-v)**2 <= R**2) 
+# Test case 2
+x = 70
+y = 60
+
+print("Test case 2")
+print ((u-x)**2 + (v-y)**2 < R**2)

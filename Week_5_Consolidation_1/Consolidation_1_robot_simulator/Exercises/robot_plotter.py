@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
-robot_size = 50
+robot_size = 3.248 * 25.4
 robot_shape = robot_size*np.array([[-1,0,1,-1],
                                   [-1,1,-1,-1]])
 
@@ -45,8 +45,8 @@ def show_plot(map_coords, goal=None, obstacle=None, pause=0):
     ax = fig.gca()
 
     if obstacle:
-        obstacle_patch = patches.Rectangle(
-            (obstacle[0][0], obstacle[0][1]), obstacle[1][0], obstacle[1][1],
+        obstacle_patch = patches.Circle(
+            (obstacle[0][0], obstacle[0][1]), obstacle[1],
             facecolor='gray', label='Obstacle')
     
         ax.add_patch(obstacle_patch)

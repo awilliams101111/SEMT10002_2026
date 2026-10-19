@@ -8,13 +8,15 @@ WORLD_X_MIN = 0.0
 WORLD_X_MAX = 10000.0
 WORLD_Y_MIN = 0.0
 WORLD_Y_MAX = 10000.0
-GOAL_TOLERANCE = 5.0
 
-WHEEL_SEPARATION_IN= 5.906   # distance between the two wheels
-WHEEL_RADIUS_IN     = 1.378   # radius of each wheel
-ROBOT_RADIUS_IN     = 3.248   # radius of the robot body
+GOAL_TOLERANCE = 50.0
+
+WHEEL_SEPARATION_IN= 5.906   # distance between the two wheels in inches
+WHEEL_RADIUS_IN     = 1.378   # radius of each wheel in inches
+ROBOT_RADIUS_IN     = 3.248   # radius of the robot body in inches
+
 MAX_WHEEL_SPEED = 10
-
+#Convert to millimetres
 WHEEL_SEPARATION_MM = WHEEL_SEPARATION_IN * 25.4
 WHEEL_RADIUS_MM = WHEEL_RADIUS_IN * 25.4
 ROBOT_RADIUS_MM = ROBOT_RADIUS_IN * 25.4
@@ -185,6 +187,11 @@ def controller_3(x, y, theta, goal_x, goal_y, obstacle_x=None, obstacle_y=None, 
     return left, right 
 
 def controller_4(x, y, theta, goal_x, goal_y, obstacle_x=None, obstacle_y=None, obstacle_radius=None):
+    '''
+    For controller 4, you should *not* use obstacle_x, obstacle_y or obstacle_radius directly. 
+    You can pass them as inputs to has_collided (and use the the return value it outputs).
+    But no direct acess from within this function!
+    ''' 
 
     left = random.random()
     right = random.random()

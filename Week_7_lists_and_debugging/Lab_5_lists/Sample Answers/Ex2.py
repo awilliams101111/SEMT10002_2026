@@ -2,86 +2,141 @@
 ================
 Exercise 2
 ================
-1. The following table contains data from a recent assessment. 
-Make some lists to store this data (one list per question) and 
-then write a loop to calculate the average mark for each question. 
 
-Student   Question 1  Question 2  Question 3 
-Martin    6           1           4 
-Arthur    3           8           4 
-Hemma     7           4           5 
-Josh      4           7           3 
+(a) The function given below should return a new list containing the sum of every k 
+consecutive values in a list.
+Every litem in the new list must be the sum of k values. 
+Find and fix the problem with the current function, so that it handles boundary index 
+values (the first and last item(s) in a list) correctly.
+Fix the function so that it handles boundary index values (the first and last item(s) 
+in a list) correctly.
+
+(b) A moving average filter is used in signal processing for smoothing data
+It returns the average of every N consecutive values in a sequence. 
+Modify the function so that it returns the average of every k consecutive values in a 
+list, instead of the total. 
+
+(c) A robot has a 360° LiDAR scanner producing one distance measurement every 10°. 
+To apply a 3 point moving average, for example, the mean of the readings at 350°, 0°, and 
+10° must be calculated. 
+Assuming the reading at 0° is the first value in the list and 350° is the last, wraparound 
+boundary conditions are needed. 
+Wraparound boundary conditions:
+- If the index is the last in the sequence, its upper neightbour is the first in the sequence 
+- If the index is the first in the sequence, its lower neighbour is the last in the sequence
+
+Modify your function so that it applies wraparound boundary conditions 
+       
 '''
 
-question1_marks = [6, 3, 4, 7]
-question2_marks = [1, 8, 4, 7]
-question3_marks = [4, 4, 5, 3]
+def filter(xs, k):
 
-for ii in [question1_marks, question2_marks, question3_marks]:
+    totals = []
+    
+    for i in range(len(xs)):
+        
+        print(xs[i:i+k]) # Shows the issue
 
-    total = 0
+        total = sum(xs[i:i+k])
+        
+        totals.append(total)
 
-    for mark in ii:
+    return totals
 
-        # Cumulatively add the marks for the question
-        total += mark
+totals = filter([1,2,3,4,5,6,7,8,9], 3)
+print(totals)
+print()
 
-    # Find the average for the question
-    average = total / len(ii)
+# -------------------------------------------
+# a
+# -------------------------------------------
 
-    print(average)
+def filter_fixed(xs, k):
+
+    totals = []
+    
+    # for i in range(len(xs)): # This line fixed 
+    for i in range(len(xs) - k + 1):
+
+        # print(xs[i:i+k]) 
+
+        total = sum(xs[i:i+k])
+        
+        totals.append(total)
+
+    return totals
+
+totals = filter_fixed([1,2,3,4,5,6,7,8,9], 3)
+print(totals)
+
+# -------------------------------------------
+# b
+# -------------------------------------------
+def filter_average(xs, k):
+
+    means = []
+    
+    for i in range(len(xs) - k + 1):
+
+        # print(xs[i:i+k]) 
+
+        total =sum(xs[i:i+k])
+
+        mean = total/k
+        
+        means.append(mean)
+
+    return means
+
+means = filter_average([1,2,3,4,5,6,7,8,9], 3)
+print(means)
 
 
+# -------------------------------------------
+# c
+# -------------------------------------------
 
-'''
-2a. Write a loop to calculate the sum of the values in 3 x 3 matrices. 
-What is the sum of the values in the matrix below?
+# Approach i
+def filter_wraparound(xs, k):
 
-5 3 4
-3 4 2
-4 3 1
-'''
+    means = []
 
-matrix = [[5, 3, 4],
-          [3, 4, 2],
-          [4, 3, 1]]
+    for i in range(len(xs)):
 
-total = 0
+        total = sum(xs[i:i+k])
 
-for ii in matrix:
-    for jj in ii:
-        total += jj
+        # If index out of range, takes values form the starts of the list
+        if i+k > len(xs):
+            difference = int(i+k - len(xs))
+            total += sum(xs[:difference])
 
-print(total)
+        mean = total/k
+        
+        means.append(mean)
 
-'''
-2b. Write a loop that replaces each value in a matrix with its square. 
-i.e the top left value (5) should be replaced with 5^2=25 and so on.
-'''
+    return means
 
-for ii in matrix:
-    for jj in range(len(ii)):
-        ii[jj] = ii[jj]**2
-print(matrix)
+means = filter_wraparound([1,2,3,4,5,6,7,8,9], 3)
+print(means)
 
+# Approach ii - Use modulo operator to get wraparound indexes
+def filter_wraparound(xs, k):
 
-'''
-4. Write some code that given a list of numbers will create a new list where each element 
-is the cumulative sum of numbers in the first list. 
+    means = []
 
-I.e if we have the list of numbers 
-list_of_numbers = [1, 3, 6, 10], 
-then our code should create a new list
-cumulative_sum = [1, 4, 10, 20]
-'''
+    for i in range(len(xs)):
 
-list_of_numbers = [1, 3, 6, 10]
+        total = 0
 
-number_to_append = 0
-cumulative_sum = []
+        for j in range(k):
+            index = (i+j) % len(xs)
+            total += xs[index]
 
-for ii in list_of_numbers:
-    number_to_append += ii
-    cumulative_sum.append(number_to_append)
+        mean = total/k
+        
+        means.append(mean)
 
-print(cumulative_sum)
+    return means
+
+means = filter_wraparound([1,2,3,4,5,6,7,8,9], 3)
+print(means)

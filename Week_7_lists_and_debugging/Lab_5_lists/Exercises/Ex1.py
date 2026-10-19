@@ -1,22 +1,24 @@
 '''
-====================
+================
 Exercise 1
-====================
+================
+The table contains each student's mark for each question in an assessment. 
 
-1. Make two lists containing the values [1, 4, 9] and [1, 8, 27].
-2. Make a nested list that contains both lists.
-3. Find the sum of the first element of the first list and the last element of the second list.
-4. Check if the number 9 appears in either of the lists 
-5. Extend each list by adding a 4th value, 30, to each list.
-6. Rewrite the following using a list comprehension.
+a. Use lists to represent the table
 
-    squares = []
+Student   Question 1  Question 2  Question 3 
+Martin    6           5           5 
+Arthur    10          4           6 
+Hemma     7           2           5 
+Josh      4           3           3 
 
-    for x in range(6):
-        squares.append(x*x)
+b. Calculate the average mark for each question
+
+c. If the maximum possible mark for Questions 1, 2 and 3 is 10, 5 and 6 respectively, 
+produce a new table that shows each mark as a percentage of the total mark for each 
+question.
+
+d. Calculate each student's total score as a percentage of the total possible mark for the assessment
 
 '''
 
-list1 = '???'
-list2 = '???'
-nested_list = '???'

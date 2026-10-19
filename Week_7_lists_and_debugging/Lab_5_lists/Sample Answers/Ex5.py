@@ -70,10 +70,10 @@ def mergesort(numbers):
     single merged list achieved 
     """
 
-    n = len(numbers)
+    list_length = len(numbers)
     size = 4
 
-    for start in range(0, n, size):
+    for start in range(0, list_length, size):
 
         section = numbers[start:start+size]
 
@@ -84,8 +84,8 @@ def mergesort(numbers):
         numbers[start:start+size] = section
 
     # Merge increasingly large sections until single merged list achieved 
-    while size < n:
-        for start in range(0, n, 2*size):
+    while size < list_length:
+        for start in range(0, list_length, 2*size):
             left_section = numbers[start:start+size]
             right_section = numbers[start+size:start+2*size]
 
@@ -105,34 +105,137 @@ def my_timsort(numbers):
     single merged list achieved 
     """
 
-    n = len(numbers)
+    run_starts = []
+    run_ends = []
+    run = []
+    # count = 1
+
+    for i, j in enumerate(numbers):
+
+        # Add item to the run
+        run.append(j)
+        # print(run)
+
+        if len(run)>1:
+
+            # Test if ascending
+            # if run[-1]>=run[-2]:
+            #     print("ascending")
+                # count += 1
+
+            # Descending
+            # else:
+            if run[-1]<run[-2]:
+                # Test if there is a run of 3 or more
+                # if count > 2:
+                if len(run) > 3:
+                    print("run of", len(run)-1, run[:-1])
+                    run_ends.append(i)
+                    run_starts.append(i-len(run)+1)
+                # print("reset")
+                run = [j]
+                # count = 1
+            # print("count=", count)
+    
+    # If list termintes part-way through a run, record the run
+    if len(run) > 2:
+        print("run of", len(run), run)
+        run_ends.append(i+1)
+        run_starts.append(i+1-len(run))
+
+    print(run_starts)
+    print(run_ends)
+
+    # Insertion sort all unsorted sections and record start and end values
+    list_length = len(numbers)
     size = 4
 
-    for start in range(0, n, size):
+    run_ends.insert(0,0)
+    run_starts.append(len(numbers))
 
-        section = numbers[start:start+size]
+    print(run_starts)
+    print(run_ends)
 
-        # Insertion sort each section
-        insertion_sort(section)
+    print('numbers', numbers)
 
-        # Replace section of original list with sorted section
-        numbers[start:start+size] = section
+    all_starts = run_starts.copy()
 
-    # Merge increasingly large sections until single merged list achieved 
-    while size < n:
-        for start in range(0, n, 2*size):
-            left_section = numbers[start:start+size]
-            right_section = numbers[start+size:start+2*size]
+    for e, s in zip(run_ends, run_starts):
 
-            merged = merge(left_section, right_section)
+        print(e, s)
 
-            numbers[start:start+len(merged)] = merged
+        for start in range(e, s, size):
+            print(start)
+            end = min(s, start+size)
+            section = numbers[start:end]
+            # print('section', section)
+            all_starts.append(start)
 
-        size *= 2
+            # Insertion sort each section
+            insertion_sort(section)
+            print(section)
+
+            # Replace section of original list with sorted section
+            numbers[start:end] = section
+
+        print('numbers', numbers)
+
+    # Merge nieghbouring sections 
+    print(all_starts)
+    insertion_sort(all_starts)
+    print(all_starts)
+
+    for s in all_starts:
+        pass
 
 
-numbers = [38, 12, 27, 43, 9, 31, 18, 25, 3, 14]
-my_timsort(numbers)
-print(numbers)
+
+
+
+nums = [4,1,2,3,5,3,4, 6, 3, 7, 3, 5,3,1,2,8,5,6,7]
+my_timsort(nums)
+
+
+
+
+
+
+
+        
+
+        
+
+
+
+
+#     n = len(numbers)
+#     size = 4
+
+#     for start in range(0, n, size):
+
+#         section = numbers[start:start+size]
+
+#         # Insertion sort each section
+#         insertion_sort(section)
+
+#         # Replace section of original list with sorted section
+#         numbers[start:start+size] = section
+
+#     # Merge increasingly large sections until single merged list achieved 
+#     while size < n:
+#         for start in range(0, n, 2*size):
+#             left_section = numbers[start:start+size]
+#             right_section = numbers[start+size:start+2*size]
+
+#             merged = merge(left_section, right_section)
+
+#             numbers[start:start+len(merged)] = merged
+
+#         size *= 2
+
+
+# numbers = [38, 12, 27, 43, 9, 31, 18, 25, 3, 14]
+# my_timsort(numbers)
+# print(numbers)
 
 

@@ -1,6 +1,6 @@
 import math
 import random
-from robot_plotter_v2 import init_plot, snapshot, show_plot
+from robot_plotter import init_plot, snapshot, show_plot
 from math import sin, cos, pi
 
 
@@ -40,6 +40,7 @@ def robot_speed(omega_left, omega_right, radius):
     '''
     return average(wheel_speed(omega_left, radius), 
                    wheel_speed(omega_right, radius))
+
 
 def turn_rate(left_speed, right_speed, wheel_separation):
     ''' 
@@ -137,7 +138,7 @@ def has_collided(x, y, obstacle_x, obstacle_y, obstacle_radius):
     return False
 
 def run_scenario(controller, start_x, start_y, start_theta, 
-                 max_time = 50, goals_x=None, goals_y=None, 
+                 max_time = 50, goal_x=None, goal_y=None, 
                  obstacle_x=None, obstacle_y=None, 
                  obstacle_radius=None):
 
@@ -148,127 +149,108 @@ def run_scenario(controller, start_x, start_y, start_theta,
     t = 0
     step = 1
 
-    goals = list(zip(goals_x, goals_y))
+    state = 'GO_TO_GOAL'
+
+    # Check to see if we have a goal or not.
+    if goal_x and goal_y:
+        # If we do, make it into a tuple we can pass to the plotting function
+        goal = (goal_x, goal_y)
+    else:
+        goal = None
+
+    # Check to see if we have an obstacle or not
+    if obstacle_x and obstacle_y and obstacle_radius:
+        #If we do, make it into a tuple we can pass to the plotting function
+        obstacle = (obstacle_x, obstacle_y, obstacle_radius)
+    else:
+        obstacle = None
 
     #Initialise the plot
     init_plot(x, y, theta)
 
-    # Iterate through a series of points
-    for goal_x, goal_y in goals:
+    #Show the initial configuration for 0.1 seconds
+    show_plot(WORLD_X_MIN, WORLD_X_MAX, WORLD_Y_MIN, WORLD_Y_MAX, goal, obstacle, pause=0.1)
 
+    #Main simulation loop
+    while t < max_time:
+        #Ask the controller what speeds we should set the robot wheels to.
+        left_speed, right_speed = controller(x, y, theta, goal_x, goal_y, 
+                                             obstacle_x, obstacle_y, obstacle_radius, state)
+        
+        #Make sure we don't exceed the maximum allowable speeds.
+        left_speed = max(-MAX_WHEEL_SPEED, min(MAX_WHEEL_SPEED, left_speed))
+        right_speed = max(-MAX_WHEEL_SPEED, min(MAX_WHEEL_SPEED, right_speed))
 
-        state = 'GO_TO_GOAL'
+        #Integrate for one second
+        print(theta)
+        x, y, theta = get_new_position(step, left_speed, right_speed, x, y, theta)
+        print(theta)
 
-        # Check to see if we have a goal or not.
-        if goal_x and goal_y:
-            # If we do, make it into a tuple we can pass to the plotting function
-            goal = (goal_x, goal_y)
-        else:
-            goal = None
+        # # -------------------------------------------------------------
+        # # Controller 3
+        # # -------------------------------------------------------------
+        # if state == 'AVOID_1':
+        #     state = 'AVOID_2'
 
-        # Check to see if we have an obstacle or not
-        if obstacle_x and obstacle_y and obstacle_radius:
-            #If we do, make it into a tuple we can pass to the plotting function
-            obstacle = (obstacle_x, obstacle_y, obstacle_radius)
-        else:
-            obstacle = None
+        # elif state == 'AVOID_2' and x <= (obstacle_x-obstacle_radius):
+        #     state = 'AVOID_3'
 
+        # elif state == 'AVOID_3':
+        #     state = 'AVOID_4'
+        
+        # elif state == 'AVOID_4' and y >= (obstacle_y+obstacle_radius):
+        #     state = 'GO_TO_GOAL'
 
+        # -------------------------------------------------------------
+        # Controller 4
+        # -------------------------------------------------------------
+        if state == 'AVOID_1':
+            state = 'AVOID_2'
 
-        #Show the initial configuration for 0.1 seconds
-        show_plot(WORLD_X_MIN, WORLD_X_MAX, WORLD_Y_MIN, WORLD_Y_MAX, goals, obstacle, pause=0.1)
+        elif state == 'AVOID_2':
+            state = 'AVOID_3'
 
-        #Main simulation loop
-        while t < max_time:
-            #Ask the controller what speeds we should set the robot wheels to.
-            left_speed, right_speed = controller(x, y, theta, goal_x, goal_y, 
-                                                obstacle_x, obstacle_y, obstacle_radius, state)
-            
-            #Make sure we don't exceed the maximum allowable speeds.
-            left_speed = max(-MAX_WHEEL_SPEED, min(MAX_WHEEL_SPEED, left_speed))
-            right_speed = max(-MAX_WHEEL_SPEED, min(MAX_WHEEL_SPEED, right_speed))
+        elif state == 'AVOID_3':
+            state = 'AVOID_4'
+        
+        elif state == 'AVOID_4':
+            state = 'GO_TO_GOAL'
+   
 
-            #Integrate for one second
-            print(theta)
-            x, y, theta = get_new_position(step, left_speed, right_speed, x, y, theta)
-            print(theta)
+        #Draw the updated position
+        snapshot(x, y, theta)
+        show_plot(WORLD_X_MIN, WORLD_X_MAX, WORLD_Y_MIN, WORLD_Y_MAX, goal, obstacle, pause=0.1)
+        t = t + step
 
-            # # -------------------------------------------------------------
-            # # Controller 3
-            # # -------------------------------------------------------------
-            # if state == 'AVOID_1':
-            #     state = 'AVOID_2'
+        print(state)
 
-            # elif state == 'AVOID_2' and x <= (obstacle_x-obstacle_radius):
-            #     state = 'AVOID_3'
+        #Check we're still inside the arena
+        if not is_inside_arena(x, y):
+            print("Error - robot tried to leave the arena")
+            break 
 
-            # elif state == 'AVOID_3':
-            #     state = 'AVOID_4'
-            
-            # elif state == 'AVOID_4' and y >= (obstacle_y+obstacle_radius):
-            #     state = 'GO_TO_GOAL'
+        if obstacle and has_collided(x, y, obstacle_x, obstacle_y, obstacle_radius):
+            print("Obstacle_detected")
+            # Initiate obstacle avoidance sequence
+            if state == 'GO_TO_GOAL':
+                state = 'AVOID_1'
 
-            # -------------------------------------------------------------
-            # Controller 4
-            # -------------------------------------------------------------
-            if state == 'AVOID_1':
-                state = 'AVOID_2'
+    #Now the main loop has finished, let's see how close we are to the goal.
+    if goal:
+        x_error = abs(x - goal_x)
+        y_error = abs(y - goal_y)
+        total_error = math.sqrt(x_error**2 + y_error**2)
+        print("Robot has stopped moving -- distance to goal is:", total_error)
+        if total_error < GOAL_TOLERANCE:
+            print ("You reached the goal -- well done!")
 
-            elif state == 'AVOID_2':
-                state = 'AVOID_3'
+    # Plot the map one final time, with a longer (5 seconds) pause so we can inspect 1.
+    show_plot(WORLD_X_MIN, WORLD_X_MAX, WORLD_Y_MIN, WORLD_Y_MAX, goal, obstacle, pause=5.0)
 
-            elif state == 'AVOID_3':
-                state = 'AVOID_4'
-            
-            elif state == 'AVOID_4':
-                state = 'GO_TO_GOAL'
-    
-
-            #Draw the updated position
-            snapshot(x, y, theta)
-            # show_plot(WORLD_X_MIN, WORLD_X_MAX, WORLD_Y_MIN, WORLD_Y_MAX, goal, obstacle, pause=0.1)
-            # goals = zip(goals_x, goals_y)
-            show_plot(WORLD_X_MIN, WORLD_X_MAX, WORLD_Y_MIN, WORLD_Y_MAX, goals, obstacle, pause=0.1)
-            t = t + step
-
-            print(state)
-
-            #Check we're still inside the arena
-            if not is_inside_arena(x, y):
-                print("Error - robot tried to leave the arena")
-                break 
-
-            if obstacle and has_collided(x, y, obstacle_x, obstacle_y, obstacle_radius):
-                print("Obstacle_detected")
-                # Initiate obstacle avoidance sequence
-                if state == 'GO_TO_GOAL':
-                    state = 'AVOID_1'
-
-        # #Now the main loop has finished, let's see how close we are to the goal.
-        # if goal:
-        #     x_error = abs(x - goal_x)
-        #     y_error = abs(y - goal_y)
-        #     total_error = math.sqrt(x_error**2 + y_error**2)
-        #     print("Robot has stopped moving -- distance to goal is:", total_error)
-        #     if total_error < GOAL_TOLERANCE:
-        #         print ("You reached the goal -- well done!")
-
-            # Let's see how close we are to the goal.
-            x_error = abs(x - goal_x)
-            y_error = abs(y - goal_y)
-            total_error = math.sqrt(x_error**2 + y_error**2)
-            print("Robot has stopped moving -- distance to goal is:", total_error)
-            if total_error < GOAL_TOLERANCE:
-                print ("You reached the goal -- well done!")
-                break
-
-        # Plot the map one final time, with a longer (5 seconds) pause so we can inspect 1.
-        show_plot(WORLD_X_MIN, WORLD_X_MAX, WORLD_Y_MIN, WORLD_Y_MAX, goals, obstacle, pause=0.1)
 
 def move_linearly_to_goal(error): 
     print('Move to goal')
-    # k = 0.0005
-    k = 0.001
+    k = 0.0005
     speed = k * error
     return speed
 
@@ -305,37 +287,13 @@ def compute_wheel_speed_for_translation(translation_mm):
     omega = translation_mm / WHEEL_RADIUS_MM
     return omega
 
-def generate_lawnmower_sequence(start_x, start_y):
-
-    x, y = start_x, start_y
-
-    goals_x = []
-    goals_y = []
-
-    for i in range(2):
-        x += 2000
-        goals_x.append(x)
-        goals_y.append(y)
-
-        y += 8000
-        goals_x.append(x)
-        goals_y.append(y)
-
-        x+=2000
-        goals_x.append(x)
-        goals_y.append(y)
-
-        y-= 8000
-        goals_x.append(x)
-        goals_y.append(y)
-
-    return goals_x, goals_y
+# Calculate wheel speed
 
 def controller_1(x, y, theta, 
                  goal_x, goal_y, 
                  obstacle_x=None, 
                  obstacle_y=None, 
-                 obstacle_radius=None, state='GO_TO_GOAL'):
+                 obstacle_radius=None):
 
     x_distance = (goal_x - x) #* cos(theta) 
     y_distance = (goal_y - y) #* sin(theta)
@@ -350,7 +308,7 @@ def controller_1(x, y, theta,
 
 def controller_2(x, y, theta, goal_x, goal_y, 
                  obstacle_x=None, obstacle_y=None, 
-                 obstacle_radius=None, state='GO_TO_GOAL'):
+                 obstacle_radius=None):
 
     x_distance = (goal_x - x) #* cos(theta) 
     y_distance = (goal_y - y) #* sin(theta)
@@ -431,49 +389,32 @@ def main():
     start_x = 5000
     start_y = 1000
     start_theta = pi / 2
-    # goal_x = 5000
-    # goal_y = 8000
-    goals_x = [5000]
-    goals_y = [8000]
+    goal_x = 5000
+    goal_y = 8000
     max_time = 100
     # run_scenario(controller_1, start_x, start_y, start_theta, max_time, goal_x, goal_y)
-    # run_scenario(controller_1, start_x, start_y, start_theta, max_time, goals_x, goals_y)
-    
 
     # Scenario 2 -- Can you turn and then move in a straight line to the goal?
+    
     start_x = 1000
     start_y = 5000
     start_theta = pi
     goal_x = 1000
     goal_y = 1000
-    goals_x = [1000, 2000, 1500]
-    goals_y = [1000, 1000, 3000] 
-    max_time = 10000
+    max_time = 100
     # run_scenario(controller_2, start_x, start_y, start_theta, max_time, goal_x, goal_y)
-    # run_scenario(controller_2, start_x, start_y, start_theta, max_time, goals_x, goals_y)
-
-    # Scenario 2 -- Lawnmower
-    start_x = 1000
-    start_y = 1000
-    start_theta = 0
-    goals_x, goals_y = generate_lawnmower_sequence(start_x, start_y) 
-    max_time = 10000
-    run_scenario(controller_2, start_x, start_y, start_theta, max_time, goals_x, goals_y)
     
     # Scenario 3 -- Can you naivgate past a fixed obstacle?
     start_x = 5000
     start_y = 1000
     start_theta = pi
-    # goal_x = 5000
-    # goal_y = 8000
-    goals_x = [5000, 9000, 1500]
-    goals_y = [9000, 5000, 3000]
+    goal_x = 5000
+    goal_y = 8000
     obstacle_x = 5000
     obstacle_y = 5000
     obstacle_radius = 500
     max_time = 10000
     # run_scenario(controller_3, start_x, start_y, start_theta, max_time, goal_x, goal_y, obstacle_x, obstacle_y, obstacle_radius)
-    # run_scenario(controller_3, start_x, start_y, start_theta, max_time, goals_x, goals_y, obstacle_x, obstacle_y, obstacle_radius)
     
     # Scenario 4 -- Can you navigate past a randomly located obstacle?
     start_x = 100 + 4900 * random.random()
@@ -481,8 +422,6 @@ def main():
     start_theta = pi
     goal_x = 5000 + (4000 * random.random())
     goal_y = 6000 + (3000 * random.random())
-    goals_x = [5000 + (4000 * random.random())]
-    goals_y = [6000 + (3000 * random.random())]
     #Generate an initial obstacle position
     obstacle_x = 2500 + (5000 * random.random())
     obstacle_y = 2500 + (5000 * random.random())
@@ -493,8 +432,7 @@ def main():
        obstacle_y = 2500 + (5000 * random.random())
     
     max_time = 100000
-    # run_scenario(controller_4, start_x, start_y, start_theta, max_time, goal_x, goal_y, obstacle_x, obstacle_y, obstacle_radius)
-    # run_scenario(controller_4, start_x, start_y, start_theta, max_time, goals_x, goals_y, obstacle_x, obstacle_y, obstacle_radius)
+    run_scenario(controller_4, start_x, start_y, start_theta, max_time, goal_x, goal_y, obstacle_x, obstacle_y, obstacle_radius)
     
 if __name__ == "__main__":
     main()

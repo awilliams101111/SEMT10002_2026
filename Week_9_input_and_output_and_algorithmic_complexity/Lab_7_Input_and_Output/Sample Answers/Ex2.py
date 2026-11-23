@@ -23,6 +23,7 @@ with open('input.csv') as file:
 
 # Remove the heading from each column
 numerical_data = data_list[1:]
+print(numerical_data)
 
 # Convert string data in each row to numerical data
 for ii in numerical_data:

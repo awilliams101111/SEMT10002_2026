@@ -38,7 +38,7 @@ coordinates = data[1:]
 
 # Convert numerical values to numerical data
 for ii in coordinates:
-    print(ii)
+    #print(ii)
     for jj, kk in enumerate(ii):
         ii[jj] = int(kk)
 
@@ -52,6 +52,8 @@ for ii in coordinates:
     
     # Add distance to data
     ii.append(round(distance, 3))
+
+    position = ii[:3]
 
 with open('results.csv', 'w') as file:
     writer = csv.writer(file)

@@ -38,17 +38,30 @@ coordinates = data[1:]
 
 # Convert numerical values to numerical data
 for ii in coordinates:
+<<<<<<< HEAD:Week_9_input_and_output_and_algorithmic_complexity/Lab_7_Input_and_Output/Sample Answers/Ex3.py
     #print(ii)
+=======
+>>>>>>> 77eef5ed7e62d1bcf6b799f70a04695e010f3323:Week_9_input_and_output_and_algorithmic_complexity/Lab_7_Input_and_Output/Sample_Answers/Ex3.py
     for jj, kk in enumerate(ii):
         ii[jj] = int(kk)
 
+    # Print the (x,y,z) coordinates of each row in the file
+    print(ii)
+
+
 position = [0, 0, 0]
-# Compute the magnitude
+
+# Compute the distance, d, to each point from the previous point
+# (for the first point compute the distance from (0,0,0))
 for ii in coordinates:
 
+    # Compute the distance from the current position to the next point
     distance = sqrt((ii[0] - position[0])**2 +
                     (ii[1] - position[1])**2 +
                     (ii[2] - position[2])**2)
+    
+    # Update the value of the current position
+    position = [ii[0], ii[1], ii[2]]
     
     # Add distance to data
     ii.append(round(distance, 3))

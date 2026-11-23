@@ -26,11 +26,13 @@ numerical_data = data_list[1:]
 print(numerical_data)
 
 # Convert string data in each row to numerical data
-for ii in numerical_data:
+print('Numerical data', numerical_data)
 
-    for jj, kk in enumerate(ii):
-
-        ii[jj] = int(kk)
+for line in numerical_data:
+    print(line)
+    for ii, item in enumerate(line):
+        line[ii] = int(item)
+print(numerical_data)
 
 # Compute discriminant and roots for each row
 discriminant = []
